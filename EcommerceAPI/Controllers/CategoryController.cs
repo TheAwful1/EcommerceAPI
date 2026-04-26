@@ -34,7 +34,7 @@ namespace EcommerceAPI.Controllers
 
             return Ok(category);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create([FromBody] Categories category)
         {

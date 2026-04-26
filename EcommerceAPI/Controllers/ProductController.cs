@@ -24,7 +24,7 @@ namespace EcommerceAPI.Controllers
             var products = await _service.GetAllAsync();
             return Ok(products);
         }
-
+        [Authorize(Roles = "Admin")]
         [HttpPost]
         public async Task<IActionResult> Create(CreateProductDto dto)
         {
