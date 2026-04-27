@@ -1,10 +1,10 @@
-﻿namespace EcommerceAPI.Services
-{
-    using EcommerceAPI.DTO.Cart;
-    using EcommerceAPI.Models;
-    using Microsoft.EntityFrameworkCore;
-    using System.Security.Claims;
+﻿using EcommerceAPI.DTO.Cart;
+using EcommerceAPI.Models;
+using Microsoft.EntityFrameworkCore;
+using System.Security.Claims;
 
+namespace EcommerceAPI.Services
+{
     public class CartService
     {
         private readonly AppDbContext _context;
@@ -16,31 +16,68 @@
             _httpContextAccessor = httpContextAccessor;
         }
 
+        private int GetUserId()
+        {
+            var userId = _httpContextAccessor.HttpContext?.User
+                .FindFirst("UserId")?.Value;
+
+            return int.Parse(userId);
+        }
+
+        public async Task AddToCartAsync(AddToCartDto dto)
+        {
+            var userId = GetUserId();
+
+            var product = await _context.Products.FindAsync(dto.ProductId);
+            if (product == null)
+                throw new Exception("Product not found");
+
+            var cart = await _context.Carts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (cart == null)
+            {
+                cart = new Carts
+                {
+                    UserId = userId,
+                    CartItems = new List<CartItems>()
+                };
+
+                _context.Carts.Add(cart);
+            }
+
+            var existingItem = cart.CartItems
+                .FirstOrDefault(ci => ci.ProductId == dto.ProductId);
+
+            if (existingItem != null)
+            {
+                existingItem.Quantity += dto.Quantity;
+            }
+            else
+            {
+                cart.CartItems.Add(new CartItems
+                {
+                    ProductId = dto.ProductId,
+                    Quantity = dto.Quantity
+                });
+            }
+
+            await _context.SaveChangesAsync();
+        }
+
         public async Task<CartDto> GetCartAsync()
         {
-            // 1. Obtener UserId del token
-            var userIdClaim = _httpContextAccessor.HttpContext.User
-                .FindFirst("UserId");
+            var userId = GetUserId();
 
-            if (userIdClaim == null)
-                throw new Exception("User not authenticated");
-
-            int userId = int.Parse(userIdClaim.Value);
-
-            // 2. Buscar carrito con items + productos
             var cart = await _context.Carts
                 .Include(c => c.CartItems)
                 .ThenInclude(ci => ci.Product)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
 
             if (cart == null)
-                return new CartDto
-                {
-                    Items = new List<CartItemDto>(),
-                    Total = 0
-                };
+                return new CartDto { CartId = 0, Items = new List<CartItemDto>() };
 
-            // 3. Mapear a DTO
             var items = cart.CartItems.Select(ci => new CartItemDto
             {
                 ProductId = ci.ProductId,
@@ -49,75 +86,48 @@
                 Quantity = ci.Quantity
             }).ToList();
 
-            // 4. Calcular total
-            var total = items.Sum(i => i.Price * i.Quantity);
-
             return new CartDto
             {
-                Items = items,
-                Total = total
+                CartId = cart.Id,
+                Items = items
             };
         }
 
-        public async Task AddToCartAsync(AddToCartDto dto)
+        public async Task RemoveItemAsync(int productId)
         {
-            // 1. Obtener UserId desde el token
-            var userIdClaim = _httpContextAccessor.HttpContext.User
-                .FindFirst("UserId");
+            var userId = GetUserId();
 
-            if (userIdClaim == null)
-                throw new Exception("User not authenticated");
-
-            int userId = int.Parse(userIdClaim.Value);
-
-            // 2. Validar producto existe
-            var product = await _context.Products
-                .FirstOrDefaultAsync(p => p.Id == dto.ProductId);
-
-            if (product == null)
-                throw new Exception("Product not found");
-
-            // 3. Buscar carrito del usuario
             var cart = await _context.Carts
+                .Include(c => c.CartItems)
                 .FirstOrDefaultAsync(c => c.UserId == userId);
 
-            // 4. Si no existe, crearlo
             if (cart == null)
-            {
-                cart = new Carts
-                {
-                    UserId = userId
-                };
+                throw new Exception("Cart not found");
 
-                _context.Carts.Add(cart);
-                await _context.SaveChangesAsync();
-            }
+            var item = cart.CartItems
+                .FirstOrDefault(ci => ci.ProductId == productId);
 
-            // 5. Buscar si el producto ya está en el carrito
-            var cartItem = await _context.CartItems
-                .FirstOrDefaultAsync(ci =>
-                    ci.CartId == cart.Id &&
-                    ci.ProductId == dto.ProductId);
+            if (item == null)
+                throw new Exception("Item not found");
 
-            if (cartItem != null)
-            {
-                // 6. Si existe → sumar cantidad
-                cartItem.Quantity += dto.Quantity;
-            }
-            else
-            {
-                // 7. Si no existe → crear nuevo item
-                cartItem = new CartItems
-                {
-                    CartId = cart.Id,
-                    ProductId = dto.ProductId,
-                    Quantity = dto.Quantity
-                };
+            cart.CartItems.Remove(item);
 
-                _context.CartItems.Add(cartItem);
-            }
+            await _context.SaveChangesAsync();
+        }
 
-            // 8. Guardar cambios
+        public async Task ClearCartAsync()
+        {
+            var userId = GetUserId();
+
+            var cart = await _context.Carts
+                .Include(c => c.CartItems)
+                .FirstOrDefaultAsync(c => c.UserId == userId);
+
+            if (cart == null)
+                return;
+
+            cart.CartItems.Clear();
+
             await _context.SaveChangesAsync();
         }
     }

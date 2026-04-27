@@ -5,30 +5,43 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace EcommerceAPI.Controllers
 {
-    [Authorize]
+    [Route("api/[controller]")]
     [ApiController]
-    [Route("api/cart")]
+    [Authorize] // 🔥 solo usuarios autenticados
     public class CartController : ControllerBase
     {
-        private readonly CartService _service;
+        private readonly CartService _cartService;
 
-        public CartController(CartService service)
+        public CartController(CartService cartService)
         {
-            _service = service;
+            _cartService = cartService;
+        }
+
+        [HttpPost]
+        public async Task<IActionResult> AddToCart(AddToCartDto dto)
+        {
+            await _cartService.AddToCartAsync(dto);
+            return Ok(new { message = "Added to cart" });
         }
 
         [HttpGet]
         public async Task<IActionResult> GetCart()
         {
-            var cart = await _service.GetCartAsync();
-            return Ok(cart);
+            return Ok(await _cartService.GetCartAsync());
         }
 
-        [HttpPost("add")]
-        public async Task<IActionResult> AddToCart(AddToCartDto dto)
+        [HttpDelete("{productId}")]
+        public async Task<IActionResult> RemoveItem(int productId)
         {
-            await _service.AddToCartAsync(dto);
-            return Ok("Added to cart");
+            await _cartService.RemoveItemAsync(productId);
+            return Ok(new { message = "Item removed" });
+        }
+
+        [HttpDelete("clear")]
+        public async Task<IActionResult> ClearCart()
+        {
+            await _cartService.ClearCartAsync();
+            return Ok(new { message = "Cart cleared" });
         }
     }
 }

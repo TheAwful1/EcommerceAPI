@@ -5,11 +5,11 @@
     using System.Text;
     using EcommerceAPI.DTO.User;
     using EcommerceAPI.Models;
+    using Microsoft.EntityFrameworkCore;
     using Microsoft.IdentityModel.Tokens;
 
     public class AuthService
     {
-
         private readonly AppDbContext _context;
         private readonly IConfiguration _config;
 
@@ -21,7 +21,7 @@
 
         public async Task Register(RegisterUserDto dto)
         {
-            var exists = _context.Users.Any(u => u.Email == dto.Email);
+            var exists = await _context.Users.AnyAsync(u => u.Email == dto.Email);
             if (exists)
                 throw new Exception("Email already exists");
 
@@ -38,29 +38,42 @@
 
         public async Task<AuthResponseDto> Login(LoginDto dto)
         {
-            var user = _context.Users.FirstOrDefault(u => u.Email == dto.Email);
+            var user = await _context.Users
+                .Include(u => u.Role) // 🔥 IMPORTANTE
+                .FirstOrDefaultAsync(u => u.Email == dto.Email);
 
             if (user == null || !BCrypt.Net.BCrypt.Verify(dto.Password, user.PasswordHash))
                 throw new Exception("Invalid credentials");
 
-            var token = GenerateJwt(user);//Error: CS1503
+            var token = GenerateJwt(user);
 
             return new AuthResponseDto { Token = token };
         }
 
-        private string GenerateJwt(Users user)//Error:CS0246
+        private string GenerateJwt(Users user)
         {
+            var keyString = _config["Jwt:Key"];
+
+            if (string.IsNullOrEmpty(keyString))
+                throw new Exception("JWT Key is missing");
+
             var key = new SymmetricSecurityKey(
-                Encoding.UTF8.GetBytes(_config["Jwt:Key"])//Error:CS8604
+                Encoding.UTF8.GetBytes(keyString)
             );
 
             var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
+            // 🔥 sacar rol correctamente
+            var role = user.Role
+                .Select(r => r.Name)
+                .FirstOrDefault() ?? "User";
+
             var claims = new[]
             {
-            new Claim("UserId", user.Id.ToString()),//Error: CS1503 Argumento 1: no se puede convertir de 'string' 'System.IO.BinaryReader'
-            new Claim(ClaimTypes.Email, user.Email) //Error: CS1503 Argumento 1: no se puede convertir de 'string' 'System.IO.BinaryReader'
-        };
+                new Claim("UserId", user.Id.ToString()),
+                new Claim(ClaimTypes.Email, user.Email),
+                new Claim(ClaimTypes.Role, role)
+            };
 
             var token = new JwtSecurityToken(
                 issuer: _config["Jwt:Issuer"],
