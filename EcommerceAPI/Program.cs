@@ -25,7 +25,6 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<CartService>();
-builder.Services.AddScoped<OrderService>();
 
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
