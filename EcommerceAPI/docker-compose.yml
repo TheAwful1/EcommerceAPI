@@ -1,0 +1,28 @@
+version: '3.8'
+
+services:
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    container_name: sqlserver
+    environment:
+      - ACCEPT_EULA=Y
+      - SA_PASSWORD=YourStrong@Password123
+    ports:
+      - "1433:1433"
+    volumes:
+      - sql_data:/var/opt/mssql
+
+  api:
+    build: .
+    container_name: ecommerceapi
+    ports:
+      - "5000:8080"
+    depends_on:
+      - db
+    environment:
+      - ASPNETCORE_URLS=http://0.0.0.0:8080
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ConnectionStrings__DefaultConnection=Server=db,1433;Database=EcommerceDb;User=sa;Password=YourStrong@Password123;TrustServerCertificate=True;
+
+volumes:
+  sql_data:

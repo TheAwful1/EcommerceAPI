@@ -31,7 +31,7 @@ builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(buil
 
 
 
-//Añadiendo la llave del token
+//Aï¿½adiendo la llave del token
 var jwtKey = builder.Configuration["Jwt:Key"]
     ?? throw new Exception("JWT Key not configured");
 
@@ -68,7 +68,7 @@ builder.Services.AddSwaggerGen(options =>
         Scheme = "bearer",
         BearerFormat = "JWT",
         In = ParameterLocation.Header,
-        Description = "Introduce el token así: Bearer {tu token}"
+        Description = "Introduce el token asï¿½: Bearer {tu token}"
     });
 
     options.AddSecurityRequirement(new OpenApiSecurityRequirement
@@ -95,7 +95,6 @@ var app = builder.Build();
 //Usando la autenticacion
 app.UseAuthentication();
 app.UseAuthorization();
-
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
