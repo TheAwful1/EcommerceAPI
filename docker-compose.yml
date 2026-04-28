@@ -13,7 +13,7 @@ services:
       - sql_data:/var/opt/mssql
 
   api:
-    build: .
+    build: buildApi
     container_name: ecommerceapi
     ports:
       - "5000:8080"
