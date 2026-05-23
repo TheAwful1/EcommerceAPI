@@ -167,7 +167,8 @@ EcommerceAPI/
 
 ## 👤 Autor
 
-Desarrollado por **[Tu Nombre]** como proyecto de portafolio.
+Desarrollado por **[TheAwful1]** como proyecto de portafolio.
 
 [![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin)](https://linkedin.com/in/tu-perfil)
+
 [![GitHub](https://img.shields.io/badge/GitHub-black?logo=github)](https://github.com/tu-usuario)
