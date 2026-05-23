@@ -41,10 +41,7 @@ public partial class AppDbContext : DbContext
 
     protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
 #warning To protect potentially sensitive information in your connection string, you should move it out of source code. You can avoid scaffolding the connection string by using the Name= syntax to read it from configuration - see https://go.microsoft.com/fwlink/?linkid=2131148. For more guidance on storing connection strings, see https://go.microsoft.com/fwlink/?LinkId=723263.
-       {
-    if (!optionsBuilder.IsConfigured)//Cuidado siempre con esto, en futuros proyectos.
-        optionsBuilder.UseSqlServer("server=CPADEFELIPE;database=Ecomerce;trusted_connection=true;TrustServerCertificate=True;");
-}
+       {}
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<CartItems>(entity =>
@@ -71,7 +68,7 @@ public partial class AppDbContext : DbContext
             entity.HasIndex(e => e.UserId, "UQ_Carts_User").IsUnique();
 
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("datetime");
 
             entity.HasOne(d => d.User).WithOne(p => p.Carts)
@@ -85,12 +82,10 @@ public partial class AppDbContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Categori__3214EC0743B80AF6");
 
             entity.Property(e => e.Description)
-                .HasMaxLength(255)
-                .IsUnicode(false);
+                .HasMaxLength(255);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Name)
-                .HasMaxLength(100)
-                .IsUnicode(false);
+                .HasMaxLength(100);
         });
 
         modelBuilder.Entity<Logins>(entity =>
@@ -98,8 +93,7 @@ public partial class AppDbContext : DbContext
             entity.HasNoKey();
 
             entity.Property(e => e.Usuarios)
-                .HasMaxLength(12)
-                .IsUnicode(false);
+                .HasMaxLength(12);
 
             entity.HasOne(d => d.UsuariosNavigation).WithMany()
                 .HasForeignKey(d => d.Usuarios)
@@ -128,11 +122,10 @@ public partial class AppDbContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Orders__3214EC07BA63833E");
 
             entity.Property(e => e.OrderDate)
-                .HasDefaultValueSql("(getdate())")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("datetime");
             entity.Property(e => e.Status)
-                .HasMaxLength(50)
-                .IsUnicode(false);
+                .HasMaxLength(50);
             entity.Property(e => e.TotalAmount).HasColumnType("decimal(10, 2)");
 
             entity.HasOne(d => d.User).WithMany(p => p.Orders)
@@ -147,13 +140,11 @@ public partial class AppDbContext : DbContext
 
             entity.Property(e => e.Amount).HasColumnType("decimal(10, 2)");
             entity.Property(e => e.PaymentMethod)
-                .HasMaxLength(50)
-                .IsUnicode(false);
+                .HasMaxLength(50);
             entity.Property(e => e.Status)
-                .HasMaxLength(50)
-                .IsUnicode(false);
+                .HasMaxLength(50);
             entity.Property(e => e.TransactionDate)
-                .HasDefaultValueSql("(getdate())")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("datetime");
 
             entity.HasOne(d => d.Order).WithMany(p => p.Payments)
@@ -167,8 +158,7 @@ public partial class AppDbContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__ProductI__3214EC07D9696550");
 
             entity.Property(e => e.ImageUrl)
-                .HasMaxLength(500)
-                .IsUnicode(false);
+                .HasMaxLength(500);
 
             entity.HasOne(d => d.Product).WithMany(p => p.ProductImages)
                 .HasForeignKey(d => d.ProductId)
@@ -181,13 +171,12 @@ public partial class AppDbContext : DbContext
             entity.HasKey(e => e.Id).HasName("PK__Products__3214EC079BAC1610");
 
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("datetime");
-            entity.Property(e => e.Description).IsUnicode(false);
+            entity.Property(e => e.Description);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Name)
-                .HasMaxLength(150)
-                .IsUnicode(false);
+                .HasMaxLength(150);
             entity.Property(e => e.Price).HasColumnType("decimal(10, 2)");
 
             entity.HasOne(d => d.Category).WithMany(p => p.Products)
@@ -203,8 +192,7 @@ public partial class AppDbContext : DbContext
             entity.HasIndex(e => e.Name, "UQ__Roles__737584F6DC257E72").IsUnique();
 
             entity.Property(e => e.Name)
-                .HasMaxLength(50)
-                .IsUnicode(false);
+                .HasMaxLength(50);
         });
 
         modelBuilder.Entity<USUARIOS>(entity =>
@@ -213,14 +201,11 @@ public partial class AppDbContext : DbContext
 
             entity.Property(e => e.Usuarios1)
                 .HasMaxLength(12)
-                .IsUnicode(false)
                 .HasColumnName("Usuarios");
             entity.Property(e => e.Clave)
-                .HasMaxLength(20)
-                .IsUnicode(false);
+                .HasMaxLength(20);
             entity.Property(e => e.Nombre)
-                .HasMaxLength(30)
-                .IsUnicode(false);
+                .HasMaxLength(30);
         });
 
         modelBuilder.Entity<Users>(entity =>
@@ -230,18 +215,15 @@ public partial class AppDbContext : DbContext
             entity.HasIndex(e => e.Email, "UQ__Users__A9D10534DED23C41").IsUnique();
 
             entity.Property(e => e.CreatedAt)
-                .HasDefaultValueSql("(getdate())")
+                .HasDefaultValueSql("CURRENT_TIMESTAMP")
                 .HasColumnType("datetime");
             entity.Property(e => e.Email)
-                .HasMaxLength(150)
-                .IsUnicode(false);
+                .HasMaxLength(150);
             entity.Property(e => e.IsActive).HasDefaultValue(true);
             entity.Property(e => e.Name)
-                .HasMaxLength(100)
-                .IsUnicode(false);
+                .HasMaxLength(100);
             entity.Property(e => e.PasswordHash)
-                .HasMaxLength(255)
-                .IsUnicode(false);
+                .HasMaxLength(255);
 
             entity.HasMany(d => d.Role).WithMany(p => p.User)
                 .UsingEntity<Dictionary<string, object>>(
