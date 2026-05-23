@@ -54,7 +54,6 @@ dotnet ef database update --connection "tu_connection_string"
 # Correr la API
 dotnet run
 ```
-
 ## 📦 Migraciones
 
 ```bash
