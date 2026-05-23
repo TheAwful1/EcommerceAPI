@@ -169,6 +169,6 @@ EcommerceAPI/
 
 Desarrollado por **[TheAwful1]** como proyecto de portafolio.
 
-[![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin)](https://linkedin.com/in/tu-perfil)
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-blue?logo=linkedin)](www.linkedin.com/in/edwin-felipe-desarrollador)
 
-[![GitHub](https://img.shields.io/badge/GitHub-black?logo=github)](https://github.com/tu-usuario)
+[![GitHub](https://img.shields.io/badge/GitHub-black?logo=github)](https://github.com/TheAwful1)
