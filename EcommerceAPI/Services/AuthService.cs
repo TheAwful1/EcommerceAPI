@@ -47,7 +47,11 @@
 
             var token = GenerateJwt(user);
 
-            return new AuthResponseDto { Token = token };
+            return new AuthResponseDto { Token = token
+                , Name = user.Name
+                , Email = user.Email
+                , Role = user.Role.Select(r => r.Name).FirstOrDefault() ?? "User"
+            };
         }
 
         private string GenerateJwt(Users user)
