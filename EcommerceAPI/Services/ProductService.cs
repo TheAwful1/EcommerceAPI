@@ -24,7 +24,8 @@ namespace EcommerceAPI.Services
                     Name = p.Name,
                     Description = p.Description,
                     Price = p.Price,
-                    CategoryName = p.Category.Name
+                    CategoryName = p.Category.Name,
+                    ImageUrl = p.ProductImages.Select(i => i.ImageUrl).FirstOrDefault()
                 }).ToListAsync();
         }
 
@@ -32,6 +33,7 @@ namespace EcommerceAPI.Services
         {
             var product = await _context.Products
                 .Include(p => p.Category)
+                .Include(p => p.ProductImages)
                 .FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
@@ -43,7 +45,9 @@ namespace EcommerceAPI.Services
                 Name = product.Name,
                 Description = product.Description,
                 Price = product.Price,
-                CategoryName = product.Category.Name
+                CategoryName = product.Category.Name,
+                ImageUrl = product.ProductImages.Select(i => i.ImageUrl).FirstOrDefault()
+    
             };
         }
 
