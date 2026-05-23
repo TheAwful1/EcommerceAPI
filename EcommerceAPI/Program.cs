@@ -29,15 +29,12 @@ builder.Services.AddScoped<CartService>();
 // Cross Origin Resource Sharing (CORS) para permitir que el frontend (React) consuma la API sin problemas de CORS
 builder.Services.AddCors(options =>
 {
+    
     options.AddPolicy("ReactClient", policy =>
     {
-        policy.WithOrigins(
-                "http://localhost:5173",  // Vite (React local)
-                "http://localhost:3000",  // Create React App
-                "https://tu-app.vercel.app" // Tu dominio en producción
-            )
-            .AllowAnyHeader()
-            .AllowAnyMethod();
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
     });
 });
 
