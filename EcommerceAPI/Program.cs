@@ -26,6 +26,21 @@ builder.Services.AddScoped<ProductService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<CartService>();
 
+// Cross Origin Resource Sharing (CORS) para permitir que el frontend (React) consuma la API sin problemas de CORS
+builder.Services.AddCors(options =>
+{
+    options.AddPolicy("ReactClient", policy =>
+    {
+        policy.WithOrigins(
+                "http://localhost:5173",  // Vite (React local)
+                "http://localhost:3000",  // Create React App
+                "https://tu-app.vercel.app" // Tu dominio en producción
+            )
+            .AllowAnyHeader()
+            .AllowAnyMethod();
+    });
+});
+
 
 builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(
     builder.Configuration.GetConnectionString("DefaultConnection"),
@@ -94,6 +109,8 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 
+// Después del app.Build() y ANTES de UseAuthentication
+app.UseCors("ReactClient");
 
 //Usando la autenticacion
 app.UseAuthentication();
