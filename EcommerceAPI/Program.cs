@@ -26,8 +26,23 @@ builder.Services.AddScoped<ProductService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<CartService>();
 
+// Cross Origin Resource Sharing (CORS) para permitir que el frontend (React) consuma la API sin problemas de CORS
+builder.Services.AddCors(options =>
+{
+    
+    options.AddPolicy("ReactClient", policy =>
+    {
+        policy.AllowAnyOrigin()
+              .AllowAnyHeader()
+              .AllowAnyMethod();
+    });
+});
 
-builder.Services.AddDbContext<AppDbContext>(options => options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
+
+builder.Services.AddDbContext<AppDbContext>(options => options.UseMySql(
+    builder.Configuration.GetConnectionString("DefaultConnection"),
+    new MySqlServerVersion(new Version(8, 0, 36))
+));
 
 
 
@@ -91,6 +106,8 @@ builder.Services.AddSwaggerGen(options =>
 var app = builder.Build();
 
 
+// Después del app.Build() y ANTES de UseAuthentication
+app.UseCors("ReactClient");
 
 //Usando la autenticacion
 app.UseAuthentication();
