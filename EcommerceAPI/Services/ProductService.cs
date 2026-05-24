@@ -114,7 +114,9 @@ namespace EcommerceAPI.Services
 
             if (product == null)
                 throw new Exception("Product not found");
-
+            // ✅ Eliminar dependencias primero
+            _context.ProductImages.RemoveRange(product.ProductImages);
+            _context.CartItems.RemoveRange(product.CartItems);
             _context.Products.Remove(product);
             await _context.SaveChangesAsync();
         }
