@@ -25,6 +25,7 @@ builder.Services.AddScoped<AuthService>();
 builder.Services.AddScoped<ProductService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddScoped<CartService>();
+builder.Services.AddScoped<OrderService>();
 
 // Cross Origin Resource Sharing (CORS) para permitir que el frontend (React) consuma la API sin problemas de CORS
 builder.Services.AddCors(options =>
