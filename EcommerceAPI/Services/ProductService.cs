@@ -110,7 +110,9 @@ namespace EcommerceAPI.Services
 
         public async Task DeleteAsync(int id)
         {
-            var product = await _context.Products.FindAsync(id);
+            var product = await _context.Products.Include(p => p.ProductImages)
+        .Include(p => p.CartItems)
+        .FirstOrDefaultAsync(p => p.Id == id);
 
             if (product == null)
                 throw new Exception("Product not found");
