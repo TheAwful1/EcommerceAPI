@@ -24,6 +24,7 @@ namespace EcommerceAPI.Services
                     Name = p.Name,
                     Description = p.Description,
                     Price = p.Price,
+                    Stock = p.Stock,
                     CategoryName = p.Category.Name,
                     ImageUrl = p.ProductImages.Select(i => i.ImageUrl).FirstOrDefault()
                 }).ToListAsync();
@@ -45,6 +46,7 @@ namespace EcommerceAPI.Services
                 Name = product.Name,
                 Description = product.Description,
                 Price = product.Price,
+                Stock = product.Stock,
                 CategoryName = product.Category.Name,
                 ImageUrl = product.ProductImages.Select(i => i.ImageUrl).FirstOrDefault()
     
