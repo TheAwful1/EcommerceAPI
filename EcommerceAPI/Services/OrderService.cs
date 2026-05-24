@@ -69,9 +69,8 @@ namespace EcommerceAPI.Services
 
             _context.Orders.Add(order);
 
-            // 🔥 limpiar carrito
-            cart.CartItems.Clear();
-
+         // 🔥 limpiar carrito — reemplaza cart.CartItems.Clear() por esto:
+            _context.CartItems.RemoveRange(cart.CartItems);
             await _context.SaveChangesAsync();
 
             return order.Id;
