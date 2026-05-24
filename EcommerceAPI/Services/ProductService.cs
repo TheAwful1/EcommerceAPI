@@ -72,7 +72,17 @@ namespace EcommerceAPI.Services
 
             _context.Products.Add(product);
             await _context.SaveChangesAsync();
-
+// ✅ Guardar imagen si viene
+    if (!string.IsNullOrEmpty(dto.ImageUrl))
+    {
+        _context.ProductImages.Add(new ProductImages
+        {
+            ProductId = product.Id,
+            ImageUrl = dto.ImageUrl,
+            IsMain = true
+        });
+        await _context.SaveChangesAsync();
+    }
             return product;
         }
 
