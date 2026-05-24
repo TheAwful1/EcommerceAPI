@@ -48,6 +48,9 @@ namespace EcommerceAPI.Services
 
             foreach (var item in cart.CartItems)
             {
+                if (item.Product.Stock < item.Quantity)
+        throw new Exception($"Stock insuficiente para {item.Product.Name}");
+
                 var orderItem = new OrderItems
                 {
                     ProductId = item.ProductId,
@@ -58,6 +61,8 @@ namespace EcommerceAPI.Services
                 total += orderItem.UnitPrice * orderItem.Quantity;
 
                 order.OrderItems.Add(orderItem);
+                // ✅ Restar stock
+                item.Product.Stock -= item.Quantity;
             }
 
             order.TotalAmount = total;
